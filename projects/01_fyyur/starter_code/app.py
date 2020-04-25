@@ -465,7 +465,15 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  artist={
+  artist = Artist.query.filter_by(id=artist_id).first()
+  form.name.data = artist.name
+  form.city.data = artist.city
+  form.state.data = artist.state
+  form.phone.data = artist.phone
+  form.image_link.data = artist.image_link
+  form.genres.data = artist.genres
+  form.facebook_link.data = artist.facebook_link
+  '''artist={
     "id": 4,
     "name": "Guns N Petals",
     "genres": ["Rock n Roll"],
@@ -477,7 +485,7 @@ def edit_artist(artist_id):
     "seeking_venue": True,
     "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
     "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
+  }'''
   # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
