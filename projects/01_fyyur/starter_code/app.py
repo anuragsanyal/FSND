@@ -41,7 +41,7 @@ class Venue(db.Model):
     phone = db.Column(PhoneNumberType(), nullable=False)
     image_link = db.Column(URLType)
     facebook_link = db.Column(URLType, nullable=False, unique=True)
-    website = db.Column(URLType,nullable=False, unique=True)
+    website = db.Column(URLType)
     genres = db.Column(db.ARRAY(db.String))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String)
@@ -61,9 +61,7 @@ class Artist(db.Model):
     facebook_link = db.Column(URLType)
     genres = db.Column(db.ARRAY(db.String))
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -228,6 +226,17 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  name = request.form['name']
+  city = request.form['city']
+  state = request.form['state']
+  address = request.form['address']
+  phone = request.form['phone']
+  genres = request.form['genres']
+  facebook_link = request.form['facebook_link']
+
+  venue = Venue(name=name, city=city,state=state,address=address,phone=phone,facebook_link=facebook_link,genres=genres)
+  db.session.add(venue)
+  db.session.commit()
 
   # on successful db insert, flash success
   flash('Venue ' + request.form['name'] + ' was successfully listed!')
