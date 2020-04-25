@@ -94,6 +94,39 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
+  city_list = db.session.query(Venue.city).group_by(Venue.city).all()
+  #num_venue = len(venue_list)
+  #print(venue_list)
+  venues = []
+
+  for city in city_list:
+    city_venues= Venue.query.filter_by(city=city).order_by('id').all()
+    city_dict = {}
+    #print(city_venues)
+    city_dict["city"] = city_venues[-1].city
+    city_dict["state"] = city_venues[-1].state
+    #print(city_dict["state"])
+    city_dict.setdefault("venues", [])
+
+    for venue in city_venues:
+      venue_dict = {}
+      venue_dict["id"] = venue.id
+      venue_dict["name"] = venue.name
+      venue_dict["num_upcoming_shows"] = 0
+      city_dict["venues"].append(venue_dict)
+
+    venues.append(city_dict)
+
+  #print(venues)        
+  '''
+  for curr_artist in venue_list:
+    venue_dict = {}
+    venue_dict["id"] = curr_artist.id
+    venue_dict["name"] = curr_artist.name
+    venue_dict["city"] = curr_artist.city
+    venues.append(venue_dict)
+  '''
+  '''
   data=[{
     "city": "San Francisco",
     "state": "CA",
@@ -115,7 +148,9 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
-  return render_template('pages/venues.html', areas=data);
+  print(data)
+  '''
+  return render_template('pages/venues.html', areas=venues);
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -271,7 +306,6 @@ def artists():
   	artist_dict["id"] = curr_artist.id
   	artist_dict["name"] = curr_artist.name
   	artists.append(artist_dict)
-
   '''	
   print(artists)
   data=[{
