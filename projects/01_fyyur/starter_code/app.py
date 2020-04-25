@@ -233,7 +233,7 @@ def create_venue_submission():
   state = request.form['state']
   address = request.form['address']
   phone = request.form['phone']
-  genres = request.form['genres']
+  genres = request.form.getlist('genres')
   facebook_link = request.form['facebook_link']
 
   venue = Venue(name=name, city=city,state=state,address=address,phone=phone,facebook_link=facebook_link,genres=genres)
