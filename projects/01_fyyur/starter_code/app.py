@@ -171,6 +171,31 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
+  venue = Venue.query.filter_by(id=venue_id).first()
+  data = {}
+  data["id"] = venue_id
+  data["name"] = venue.name
+  data["genres"] = venue.genres
+  data["address"] = venue.address
+  data["city"] = venue.city
+  data["state"] = venue.state
+  data["phone"] = venue.phone
+  data["website"] = venue.website
+  data["facebook_link"] = venue.facebook_link
+  data["seeking_talent"] = venue.seeking_talent
+  if venue:
+  	data["seeking_description"] = venue.seeking_description
+  else:
+  	data["seeking_description"] = "We are not looking for any talent currently"
+
+  data["image_link"] = venue.image_link
+  #data["image_link"] = "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
+  data["past_shows"] = {}
+  data["past_shows_count"] = 0
+  data["upcoming_shows_count"] = 0	
+  return render_template('pages/show_venue.html', venue=data)
+
+'''
   data1={
     "id": 1,
     "name": "The Musical Hop",
@@ -249,7 +274,7 @@ def show_venue(venue_id):
     "upcoming_shows_count": 1,
   }
   data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
-  return render_template('pages/show_venue.html', venue=data)
+  '''
 
 #  Create Venue
 #  ----------------------------------------------------------------
