@@ -51,15 +51,17 @@ class Artist(db.Model):
     __tablename__ = 'Artist'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
+    name = db.Column(db.String, nullable=False)
+    city = db.Column(db.String(120), nullable=False)
     state = db.Column(db.String(120))
-    phone = db.Column(PhoneNumberType())
+    phone = db.Column(PhoneNumberType(),nullable=False)
     genres = db.Column(db.String(120))
     image_link = db.Column(URLType)
     website = db.Column(URLType)
-    facebook_link = db.Column(URLType)
+    facebook_link = db.Column(URLType, nullable=False, unique=True)
     genres = db.Column(db.ARRAY(db.String))
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 #----------------------------------------------------------------------------#
