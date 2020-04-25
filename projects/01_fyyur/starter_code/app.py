@@ -190,7 +190,7 @@ def show_venue(venue_id):
 
   data["image_link"] = venue.image_link
   #data["image_link"] = "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  data["past_shows"] = {}
+  data["past_shows"] = []
   data["past_shows_count"] = 0
   data["upcoming_shows_count"] = 0	
   return render_template('pages/show_venue.html', venue=data)
@@ -366,6 +366,26 @@ def search_artists():
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
+  artist = Artist.query.filter_by(id=artist_id).first()
+  data = {}
+  data["id"] = artist_id
+  data["name"] = artist.name
+  data["genres"] = artist.genres
+  data["city"] = artist.city
+  data["state"] = artist.state
+  data["phone"] = artist.phone
+  data["website"] = artist.website
+  data["facebook_link"] = artist.facebook_link
+  data["seeking_venue"] = artist.seeking_venue
+  data["seeking_description"] = artist.seeking_description
+  data["image_link"] = artist.image_link
+  data["past_shows"] = []
+  data["upcoming_shows"] = []
+  data["past_shows_count"] = 1
+
+  return render_template('pages/show_artist.html', artist=data)
+
+  '''
   data1={
     "id": 4,
     "name": "Guns N Petals",
@@ -438,7 +458,7 @@ def show_artist(artist_id):
     "upcoming_shows_count": 3,
   }
   data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
-  return render_template('pages/show_artist.html', artist=data)
+  '''
 
 #  Update
 #  ----------------------------------------------------------------
