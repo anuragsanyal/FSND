@@ -267,10 +267,11 @@ def artists():
   artist_dict = {}
   artists = []
   for curr_artist in artist_list:
+  	artist_dict = {}
   	artist_dict["id"] = curr_artist.id
   	artist_dict["name"] = curr_artist.name
   	artists.append(artist_dict)
-  	
+
   '''	
   print(artists)
   data=[{
