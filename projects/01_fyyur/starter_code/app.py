@@ -92,7 +92,7 @@ def format_datetime(value, format='medium'):
       format="EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
       format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format)
+  return babel.dates.format_datetime(date, format,locale='en')
 
 
 app.jinja_env.filters['datetime'] = format_datetime
@@ -212,9 +212,29 @@ def show_venue(venue_id):
 
   data["image_link"] = venue.image_link
   #data["image_link"] = "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  data["past_shows"] = []
+  show_list = Show.query.filter_by(venue_id=venue_id).all()
+
+  curr_date = datetime.now()
+  data.setdefault("past_shows", [])
+  data.setdefault("upcoming_shows",[])
+  data["upcoming_shows_count"] = 0
   data["past_shows_count"] = 0
-  data["upcoming_shows_count"] = 0	
+  for show in show_list:
+  	show_dict = {}
+  	artist = Artist.query.filter_by(id=show.artist_id).first()
+  	show_dict["artist_id"] = show.artist_id
+  	show_dict["venue_id"] = show.venue_id
+  	show_dict["start_time"] = show.start_time.strftime('%m/%d/%Y')
+  	show_dict["artist_name"] = artist.name
+  	show_dict["artist_image_link"] = artist.image_link
+  	show_time = show.start_time
+  	if show_time > curr_date:
+  		data["upcoming_shows_count"] = data["upcoming_shows_count"] + 1
+  		data["upcoming_shows"].append(show_dict)
+  	else:
+  		data["past_shows_count"] = data["past_shows_count"] + 1
+  		data["past_shows"].append(show_dict)
+
   return render_template('pages/show_venue.html', venue=data)
 
 '''
@@ -591,6 +611,16 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
+  
+  show_list = Show.query.all()
+  num_shows = len(show_list)
+  print(show_list)
+  show_dict = {}
+  shows = []
+  for curr_show in show_list:
+  	show_dict = {}
+  	show_dict['venue_id']
+
   data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
