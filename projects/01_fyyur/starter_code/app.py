@@ -134,7 +134,7 @@ def venues():
       venue_dict = {}
       venue_dict["id"] = venue.id
       venue_dict["name"] = venue.name
-      venue_dict["num_upcoming_shows"] = 0
+      venue_dict["num_upcoming_shows"] = 1
       city_dict["venues"].append(venue_dict)
 
     venues.append(city_dict)
@@ -619,9 +619,16 @@ def shows():
   shows = []
   for curr_show in show_list:
   	show_dict = {}
-  	show_dict['venue_id']
-
-  data=[{
+  	venue = Venue.query.filter_by(id=curr_show.venue_id).first()
+  	artist = Artist.query.filter_by(id=curr_show.artist_id).first()
+  	show_dict["venue_id"]= venue.id
+  	show_dict["venue_name"] = venue.name
+  	show_dict["artist_id"] = artist.id
+  	show_dict["artist_name"] = artist.name
+  	show_dict["artist_image_link"] = artist.image_link
+  	show_dict["start_time"] = curr_show.start_time.strftime('%m/%d/%Y')
+  	shows.append(show_dict)
+  '''data=[{
     "venue_id": 1,
     "venue_name": "The Musical Hop",
     "artist_id": 4,
@@ -656,8 +663,8 @@ def shows():
     "artist_name": "The Wild Sax Band",
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
-  }]
-  return render_template('pages/shows.html', shows=data)
+  }]'''
+  return render_template('pages/shows.html', shows=shows)
 
 @app.route('/shows/create')
 def create_shows():
