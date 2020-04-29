@@ -421,9 +421,28 @@ def show_artist(artist_id):
   data["seeking_venue"] = artist.seeking_venue
   data["seeking_description"] = artist.seeking_description
   data["image_link"] = artist.image_link
-  data["past_shows"] = []
-  data["upcoming_shows"] = []
-  data["past_shows_count"] = 1
+  show_list = Show.query.filter_by(artist_id=artist_id).all()
+
+  curr_date = datetime.now()
+  data.setdefault("past_shows", [])
+  data.setdefault("upcoming_shows",[])
+  data["upcoming_shows_count"] = 0
+  data["past_shows_count"] = 0
+
+  for show in show_list:
+  	show_dict = {}
+  	venue = Venue.query.filter_by(id=show.artist_id).first()
+  	show_dict["venue_id"] = show.venue_id
+  	show_dict["start_time"] = show.start_time.strftime('%m/%d/%Y')
+  	show_dict["venue_name"] = venue.name
+  	show_dict["venue_image_link"] = venue.image_link
+  	show_time = show.start_time
+  	if show_time > curr_date:
+  		data["upcoming_shows_count"] = data["upcoming_shows_count"] + 1
+  		data["upcoming_shows"].append(show_dict)
+  	else:
+  		data["past_shows_count"] = data["past_shows_count"] + 1
+  		data["past_shows"].append(show_dict)
 
   return render_template('pages/show_artist.html', artist=data)
 
