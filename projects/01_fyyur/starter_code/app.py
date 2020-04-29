@@ -4,6 +4,8 @@
 
 import json
 import dateutil.parser
+import datetime
+from datetime import datetime
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
@@ -15,6 +17,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -30,9 +33,17 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-class Venue(db.Model):
-    __tablename__ = 'Venue'
 
+class Show(db.Model):
+	__tablename__ = 'show'
+	show_id = db.Column(db.Integer, primary_key=True)
+	start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+	venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
+	artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'),nullable=False)
+
+
+class Venue(db.Model):
+    __tablename__ = 'venue'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     city = db.Column(db.String(120), nullable=False)
@@ -45,10 +56,11 @@ class Venue(db.Model):
     genres = db.Column(db.ARRAY(db.String))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String)
+    shows = db.relationship('Show', backref = 'location', lazy = True)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -62,8 +74,14 @@ class Artist(db.Model):
     genres = db.Column(db.ARRAY(db.String))
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String)
+    shows = db.relationship('Show', backref = 'performer', lazy = True)
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+
+
+
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -76,7 +94,11 @@ def format_datetime(value, format='medium'):
       format="EE MM, dd, y h:mma"
   return babel.dates.format_datetime(date, format)
 
+
 app.jinja_env.filters['datetime'] = format_datetime
+
+
+
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -299,7 +321,7 @@ def create_venue_submission():
   venue = Venue(name=name, city=city,state=state,address=address,phone=phone,facebook_link=facebook_link,genres=genres)
   db.session.add(venue)
   db.session.commit()
-
+  db.session.close()
   # on successful db insert, flash success
   flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
@@ -553,6 +575,7 @@ def create_artist_submission():
   artist = Artist(name=name, city=city,state=state,phone=phone,facebook_link=facebook_link,genres=genres)
   db.session.add(artist)
   db.session.commit()
+  db.session.close()
   # on successful db insert, flash success
   flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
@@ -616,13 +639,37 @@ def create_shows():
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
+  artist_id = request.form['artist_id']
+  venue_id = request.form['venue_id']
+  start_time = request.form['start_time']
+  error = False
+  try:
+  	artist = Artist.query.filter_by(id=artist_id).first()
+  	print(artist)
+  	venue = Venue.query.filter_by(id=venue_id).first()
+  	show = Show(artist_id=artist_id, venue_id=venue_id,start_time=start_time)
+  	print(venue)
+  	print(show)
+  	db.session.add(show)
+  	db.session.commit()
+  except:
+  	error=True
+  	print('here')
+  	db.session.rollback()
+  finally:
+  	db.session.close()
+  	if error:
+  		flash('Error: could not be created')
+  		print(sys.exc_info())
+  	else:
+  		flash('Show successfully created')
+  return render_template('pages/home.html')
 
   # on successful db insert, flash success
-  flash('Show was successfully listed!')
+  
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
 
 @app.errorhandler(404)
 def not_found_error(error):
