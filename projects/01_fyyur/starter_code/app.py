@@ -564,7 +564,7 @@ def edit_artist_submission(artist_id):
   	artist.facebook_link = request.form['facebook_link']
   	db.session.commit()
   except:
-  	flash('Arstis edit failed')
+  	flash('Artist edit failed')
   	db.session.rollback()
   finally:
   	db.session.close()
@@ -603,6 +603,21 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
+  try:
+  	venue = Venue.query.filter_by(id=venue_id).first()
+  	venue.name = request.form['name']
+  	venue.city = request.form['city']
+  	venue.state = request.form['state']
+  	venue.address = request.form['address']
+  	venue.phone = request.form['phone']
+  	venue.genres = request.form.getlist('genres')
+  	venue.facebook_link = request.form['facebook_link']
+  	db.session.commit()
+  except:
+  	flash('Venue edit failed')
+  	db.session.rollback()
+  finally:
+  	db.session.close()
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
