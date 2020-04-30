@@ -98,8 +98,6 @@ def format_datetime(value, format='medium'):
 app.jinja_env.filters['datetime'] = format_datetime
 
 
-
-
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -355,17 +353,23 @@ def create_venue_submission():
   phone = request.form['phone']
   genres = request.form.getlist('genres')
   facebook_link = request.form['facebook_link']
+  try:
+  	venue = Venue(name=name, city=city,state=state,address=address,phone=phone,facebook_link=facebook_link,genres=genres)
+  	db.session.add(venue)
+  	db.session.commit()
+  	flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  except:
+  	flash('Error Venue' + request.form['name'] + 'could not be inserted!!')
+  	db.session.rollback()
+  finally:
+  	db.session.close()
+  return render_template('pages/home.html')
 
-  venue = Venue(name=name, city=city,state=state,address=address,phone=phone,facebook_link=facebook_link,genres=genres)
-  db.session.add(venue)
-  db.session.commit()
-  db.session.close()
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -421,9 +425,9 @@ def search_artists():
   # search for "band" should return "The Wild Sax Band".
   search_string = request.form['search_term']
   search_string = "%" + search_string +"%"
-  print(search_string)
+  #print(search_string)
   artist_list = Artist.query.filter(Artist.name.ilike(search_string)).all()
-  print(artist_list)
+  #print(artist_list)
   count = len(artist_list)
   response = {}
   response["count"] = count
@@ -431,7 +435,7 @@ def search_artists():
 
   for artist in artist_list:
   	artist_dict = {}
-  	print(artist)
+  	#print(artist)
   	artist_dict["id"] = artist.id
   	artist_dict["name"] = artist.name
   	shows = Show.query.filter_by(artist_id=artist.id).all()
@@ -682,15 +686,21 @@ def create_artist_submission():
   phone = request.form['phone']
   genres = request.form.getlist('genres')
   facebook_link = request.form['facebook_link']
-  artist = Artist(name=name, city=city,state=state,phone=phone,facebook_link=facebook_link,genres=genres)
-  db.session.add(artist)
-  db.session.commit()
-  db.session.close()
+  try:
+  	artist = Artist(name=name, city=city,state=state,phone=phone,facebook_link=facebook_link,genres=genres)
+  	db.session.add(artist)
+  	db.session.commit()
+  	flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  except:
+  	flash('Error : Artist' + request.form['name'] + 'could not be listed!!')
+  	db.session.rollback()
+  finally:
+  	db.session.close()
+  return render_template('pages/home.html')
+
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
 
 
 #  Shows
@@ -704,7 +714,7 @@ def shows():
   
   show_list = Show.query.all()
   num_shows = len(show_list)
-  print(show_list)
+  #print(show_list)
   show_dict = {}
   shows = []
   for curr_show in show_list:
@@ -772,11 +782,11 @@ def create_show_submission():
   error = False
   try:
   	artist = Artist.query.filter_by(id=artist_id).first()
-  	print(artist)
+  	#print(artist)
   	venue = Venue.query.filter_by(id=venue_id).first()
   	show = Show(artist_id=artist_id, venue_id=venue_id,start_time=start_time)
-  	print(venue)
-  	print(show)
+  	#print(venue)
+  	#print(show)
   	db.session.add(show)
   	db.session.commit()
   except:
