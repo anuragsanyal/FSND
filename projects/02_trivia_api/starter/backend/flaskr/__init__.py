@@ -12,7 +12,7 @@ def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  cors = CORS(app, resources={r"*/api/*":{"origins":"*"}})
+  cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
   @app.after_request
   def after_request(response):
@@ -32,6 +32,21 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+  @app.route('/categories', methods=['GET'])
+  def show_categories():
+    category_list = Category.query.all()
+    response = {}
+    response["categories"] = None
+
+    category_dict = {}
+
+    for category in category_list:
+      category_dict.setdefault(str(category.id),category.type)
+
+    response["categories"] = category_dict
+
+    return jsonify(response)  
+
 
 
   '''
